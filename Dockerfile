@@ -1,54 +1,47 @@
-# Stage 1: Build the final image using php:8.2-apache
 FROM php:8.2-apache
 
-# Set the working directory inside the container
 WORKDIR /var/www/html
 
-# Install necessary PHP extensions for Laravel
 RUN apt-get update && apt-get install -y \
-    git \
+    libpng-dev \
+    vim \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libonig-dev \
+    libxml2-dev \
     zip \
     unzip \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    libzip-dev \
-    zlib1g-dev \
-    libicu-dev \
-    g++ \
-    && docker-php-ext-install pdo_mysql \
-    && docker-php-ext-install zip \
-    && docker-php-ext-install intl \
+    git \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd
+    && docker-php-ext-install gd \
+    && docker-php-ext-install pdo mysqli pdo_mysql mbstring exif pcntl bcmath opcache intl\
+    && pecl install redis \
+    && docker-php-ext-enable redis
 
-# Enable Apache's mod_rewrite for Laravel's pretty URLs
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+
+RUN echo "<Directory /var/www/html> \n \
+    Options Indexes FollowSymLinks \n \
+    AllowOverride All \n \
+    Require all granted \n \
+</Directory>" >> /etc/apache2/apache2.conf
+
 RUN a2enmod rewrite
+
+COPY . /var/www/html
+
+RUN chown -R www-data:www-data /var/www/html
+RUN find /var/www/html -type d -exec chmod 755 {} \;
+RUN find /var/www/html -type f -exec chmod 644 {} \;
+
+# giving permission to project folders via docker-entrypoint.sh file
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* # Clean up to reduce image size
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Copy only the composer.json and composer.lock files to the composer stage
-COPY composer.json .
-COPY composer.lock .
-
-# Install PHP dependencies using Composer
-#RUN composer install --verbose --no-dev --optimize-autoloader
-
-# Copy the rest of the application code
-COPY . .
-
-# Generate the Laravel application key
-#RUN php artisan key:generate
-
-# Set permissions for Laravel storage and cache directories
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Expose port 80 for Apache
-EXPOSE 80
-
-# Start Apache in the foreground
-CMD ["apache2-foreground"]
-
-# Clean up to reduce image size
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+# Install dependencies using Composer
+#RUN composer install --no-interaction --optimize-autoloader

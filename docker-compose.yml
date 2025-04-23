@@ -1,0 +1,36 @@
+version: '3.3'
+
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: acmq-app
+        ports:
+            - "7071:80"
+        volumes:
+            - ./:/var/www/html
+        environment:
+            - APACHE_DOCUMENT_ROOT=/var/www/html/public
+        networks:
+            - acmq_network
+#        depends_on:
+#            - db
+
+#    db:
+#        image: mysql:latest
+#        container_name: acmq-dbcon
+#        environment:
+#            MYSQL_ROOT_PASSWORD: root_password
+#            MYSQL_DATABASE: simple_api_db
+#            MYSQL_USER: mfnextgen_ci4_user
+#            MYSQL_PASSWORD: ci4password
+#        ports:
+#            - "3307:3306"
+#        command: --default-authentication-plugin=mysql_native_password
+#        networks:
+#            - lara_network
+
+networks:
+    acmq_network:
+        driver: bridge
