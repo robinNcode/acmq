@@ -12,7 +12,7 @@ class SalesSeeder extends Seeder
     public function run()
     {
         $faker = Faker::create();
-        $branches = range(1, 8000);
+        $branches = range(1, 200);
         $startDate = Carbon::now()->subMonth()->startOfMonth();
         $endDate = Carbon::now()->subMonth()->endOfMonth();
 
@@ -27,12 +27,12 @@ class SalesSeeder extends Seeder
                     'customer_id' => $faker->numberBetween(1, 50000),
                     'product_info' => json_encode($this->randomProductsList($faker->numberBetween(1, 10))),
                     'selling_date' => $faker->dateTimeBetween($startDate, $endDate),
-                    'total_price' => $faker->randomFloat(2, 100, 10000),
-                    'paid' => $faker->randomFloat(2, 50, 10000),
-                    'due' => $faker->randomFloat(2, 0, 5000),
+                    'total_price' => $faker->numberBetween(100, 10000),
+                    'paid' => $faker->numberBetween(50, 10000),
+                    'due' => $faker->numberBetween(0, 5000),
                     'created_at' => now(),
-                    'updated_at' => now(),
-                    'deleted_at' => null,
+                    'updated_at' => NULL,
+                    'deleted_at' => NULL,
                 ];
             }
 

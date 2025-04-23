@@ -15,7 +15,7 @@ class ExpensesSeeder extends Seeder
     public function run(): void
     {
         $faker = Factory::create();
-        $branches = range(1, 8000);
+        $branches = range(1, 200);
         $startOfMonth = Carbon::now()->subMonth()->startOfMonth();
         $endOfMonth = Carbon::now()->subMonth()->endOfMonth();
 
@@ -25,13 +25,14 @@ class ExpensesSeeder extends Seeder
             for ($i = 0; $i < $totalExpenses; $i++) {
                 $expenses[] = [
                     'branch_id' => $branch,
-                    'amount' => $faker->randomFloat(2, 300, 1000000),
+                    'amount' => $faker->numberBetween(300, 1000000),
                     'particulars' => $faker->sentence,
                     'date' => $faker->dateTimeBetween($startOfMonth, $endOfMonth),
                     'entry_by' => $faker->numberBetween(1, 1000),
                     'approved_by' => $faker->numberBetween(1, 1000),
                     'created_at' => $faker->dateTimeBetween($startOfMonth, $endOfMonth),
-                    'updated_at' => $faker->dateTimeBetween($startOfMonth, $endOfMonth),
+                    'updated_at' => NULL,
+                    'deleted_at' => NULL,
                 ];
             }
 
