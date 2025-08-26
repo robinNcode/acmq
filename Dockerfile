@@ -35,8 +35,17 @@ RUN find /var/www/html -type d -exec chmod 755 {} \;
 RUN find /var/www/html -type f -exec chmod 644 {} \;
 
 # giving permission to project folders via docker-entrypoint.sh file
+# Copy entrypoint script
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-ENTRYPOINT ["docker-entrypoint.sh"]
+
+# Ensure it's executable
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Use absolute path
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+
+# Default command (Apache foreground)
+CMD ["apache2-foreground"]
 
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* # Clean up to reduce image size
