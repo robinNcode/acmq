@@ -31,6 +31,28 @@ services:
 #        networks:
 #            - lara_network
 
+    prometheus:
+        image: prom/prometheus:latest
+        container_name: acmq-prometheus
+        ports:
+        - "9090:9090"
+        volumes:
+        - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+        depends_on:
+        - app
+        # networks:
+        # - acmq_network
+
+    grafana:
+        image: grafana/grafana:latest
+        container_name: acmq-grafana
+        ports:
+        - "3300:3000"
+        depends_on:
+        - prometheus
+        # networks:
+        # - acmq_network
+
 networks:
     acmq_network:
         driver: bridge
