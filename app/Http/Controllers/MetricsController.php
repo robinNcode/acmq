@@ -4,19 +4,29 @@ namespace App\Http\Controllers;
 
 use Prometheus\CollectorRegistry;
 use Prometheus\RenderTextFormat;
+use Prometheus\Storage\APC;
 use Prometheus\Storage\InMemory;
+use Illuminate\Http\Response;
 
 class MetricsController extends Controller
 {
     /**
      * Expose Prometheus metrics for scraping.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
-        $registry = new CollectorRegistry(new InMemory());
+        // Use APCu storage if available, otherwise fallback to InMemory
+        if (extension_loaded('apcu') && ini_get('apc.enabled')) {
+            $storage = new APC();
+        } else {
+            $storage = new InMemory();
+        }
 
+        $registry = new CollectorRegistry($storage);
+
+        // Register counter for HTTP requests
         $counter = $registry->getOrRegisterCounter(
             'app',
             'http_requests_total',
@@ -24,6 +34,7 @@ class MetricsController extends Controller
             ['method', 'path']
         );
 
+        // Increment counter with current request info
         $counter->inc([request()->method(), request()->path()]);
 
         $renderer = new RenderTextFormat();
