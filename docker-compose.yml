@@ -14,22 +14,44 @@ services:
             - APACHE_DOCUMENT_ROOT=/var/www/html/public
         networks:
             - acmq_network
-#        depends_on:
-#            - db
+    #        depends_on:
+    #            - db
 
-#    db:
-#        image: mysql:latest
-#        container_name: acmq-dbcon
-#        environment:
-#            MYSQL_ROOT_PASSWORD: root_password
-#            MYSQL_DATABASE: simple_api_db
-#            MYSQL_USER: mfnextgen_ci4_user
-#            MYSQL_PASSWORD: ci4password
-#        ports:
-#            - "3307:3306"
-#        command: --default-authentication-plugin=mysql_native_password
-#        networks:
-#            - lara_network
+    #    db:
+    #        image: mysql:latest
+    #        container_name: acmq-dbcon
+    #        environment:
+    #            MYSQL_ROOT_PASSWORD: root_password
+    #            MYSQL_DATABASE: simple_api_db
+    #            MYSQL_USER: mfnextgen_ci4_user
+    #            MYSQL_PASSWORD: ci4password
+    #        ports:
+    #            - "3307:3306"
+    #        command: --default-authentication-plugin=mysql_native_password
+    #        networks:
+    #            - lara_network
+
+    prometheus:
+        image: prom/prometheus:latest
+        container_name: acmq-prometheus
+        ports:
+            - "9090:9090"
+        volumes:
+            - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+        depends_on:
+            - app
+        networks:
+            - acmq_network
+
+    grafana:
+        image: grafana/grafana:latest
+        container_name: acmq-grafana
+        ports:
+            - "3300:3000"
+        depends_on:
+            - prometheus
+        networks:
+            - acmq_network
 
 networks:
     acmq_network:
