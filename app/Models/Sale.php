@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use App\Models\Customer;
+use LaravelIdea\Helper\App\Models\_IH_Sale_C;
 
 /**
- * Class Sale
+ * Class SaleController
  *
  * Handles sale report fetching with optional branch filtering.
  *
@@ -19,6 +21,7 @@ class Sale extends Model
 {
     use SoftDeletes;
 
+    const PER_PAGE = 20;
     protected $table = 'sales';
 
     protected $casts = [
@@ -36,22 +39,21 @@ class Sale extends Model
      * If branch ID is null, returns all sales.
      *
      * @param int|null $branchId
-     * @return Collection
+     * @return LengthAwarePaginator|\Illuminate\Pagination\LengthAwarePaginator|_IH_Sale_C|Sale[]
      */
-    public static function getSaleReport(?int $branchId = null): Collection
+    public static function getSaleReport(?int $branchId = null): array|LengthAwarePaginator|\Illuminate\Pagination\LengthAwarePaginator|_IH_Sale_C
     {
-        $query = self::query()
+        return self::query()
             ->with(['customer'])
             ->when($branchId, function ($q) use ($branchId) {
                 $q->where('branch_id', $branchId);
             })
-            ->orderByDesc('selling_date');
-
-        return $query->get();
+            ->orderByDesc('selling_date')
+            ->paginate(self::PER_PAGE);
     }
 
     /**
-     * Customer relationship.
+     * CustomerController relationship.
      *
      * @return BelongsTo
      */

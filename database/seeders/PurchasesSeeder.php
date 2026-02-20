@@ -17,17 +17,21 @@ class PurchasesSeeder extends Seeder
         $endDate = Carbon::now()->subMonth()->endOfMonth();
 
         $salesSeeder = new SalesSeeder();
-        $products = $salesSeeder->randomProductsList($faker->numberBetween(1, 10));
+        $supplierIds = DB::table('suppliers')->pluck('id')->toArray();
 
         foreach ($branches as $branchId) {
             $purchaseData = [];
             $purchaseCount = rand(500, 600);
 
-            for ($i = 0; $i < $purchaseCount; $i++) {
+            for ($i = 1; $i <= $purchaseCount; $i++) {
+                $products = $salesSeeder->randomProductsList(
+                    $faker->numberBetween(1, 10)
+                );
+
                 $purchaseData[] = [
-                    'code' => 'P' . time() . rand(1000, 9999) . $i,
+                    'code' => sprintf('P%03d%06d', $branchId, $i),
                     'branch_id' => $branchId,
-                    'supplier_id' => $faker->numberBetween(1, 1000),
+                    'supplier_id' => $faker->randomElement($supplierIds),
                     'product_info' => json_encode($products),
                     'purchase_date' => $faker->dateTimeBetween($startDate, $endDate),
                     'total_price' => $faker->numberBetween(100, 10000),
@@ -36,7 +40,7 @@ class PurchasesSeeder extends Seeder
                     'due' => $faker->numberBetween(0, 5000),
                     'created_at' => now(),
                     'updated_at' => now(),
-                    'deleted_at' => NULL,
+                    'deleted_at' => null,
                 ];
             }
 
@@ -44,4 +48,3 @@ class PurchasesSeeder extends Seeder
         }
     }
 }
-

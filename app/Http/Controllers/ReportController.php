@@ -12,15 +12,22 @@ class ReportController extends Controller{
         $sale = new Sale();
     }
 
+    public function index()
+    {
+        return view('reports.index');
+    }
+
     public function expenseIndex(){
-        $expenses = DB::table('expenses')->get();
-        //dd($expenses);
+        $expenses = DB::table('expenses')->paginate(30);
         return view('reports.expense_report', ['expenses' => $expenses]);
     }
 
+    public function purchaseIndex()
+    {
+        $purchases = PurchaseController::getPurchaseReport();
+    }
+
     public function salesIndex(){
-        $sales = Sale::getSaleReport(null);
-        dd($sales);
-        return view('reports.sales_report', ['sales' => $sales]);
+
     }
 }

@@ -10,7 +10,7 @@ use Faker\Factory as Faker;
 /**
  * Class SupplierSeeder
  *
- * Seeds the Suppliers table with random Supplier data.
+ * Seeds the Suppliers table with random SupplierController data.
  * - Generates unique emails
  * - Random nullable phone and address
  * - Skips admin email conflict

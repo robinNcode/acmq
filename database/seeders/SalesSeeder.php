@@ -16,6 +16,8 @@ class SalesSeeder extends Seeder
         $startDate = Carbon::now()->subMonth()->startOfMonth();
         $endDate = Carbon::now()->subMonth()->endOfMonth();
 
+        $customerIds = DB::table('customers')->pluck('id')->toArray();
+
         foreach ($branches as $branchId) {
             $salesData = [];
             $salesCount = rand(500, 600);
@@ -24,7 +26,7 @@ class SalesSeeder extends Seeder
                 $salesData[] = [
                     'code' => 'S' . time() . rand(1000, 9999) . $i,
                     'branch_id' => $branchId,
-                    'customer_id' => $faker->numberBetween(1, 20000),
+                    'customer_id' => $faker->randomElement($customerIds),
                     'product_info' => json_encode($this->randomProductsList($faker->numberBetween(1, 10))),
                     'selling_date' => $faker->dateTimeBetween($startDate, $endDate),
                     'total_price' => $faker->numberBetween(100, 10000),
@@ -42,7 +44,7 @@ class SalesSeeder extends Seeder
     }
 
     /**
-     * Generate random products list for sales ...
+     * Generate a random products list for sales ...
      * @param $total_products
      * @return array
      */

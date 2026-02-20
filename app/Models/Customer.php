@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 
 /**
- * Class Customer
+ * Class CustomerController
  *
  * Handles customer data operations including branch-wise report fetching.
  *

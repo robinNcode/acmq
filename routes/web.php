@@ -1,9 +1,17 @@
 <?php
 
+use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\MetricsController;
+use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SaleController;
 use Illuminate\Support\Facades\Route;
-use Monolog\Processor\MercurialProcessor;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     return view('dashboard');
@@ -13,11 +21,43 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
 
+/*
+|--------------------------------------------------------------------------
+| Metrics
+|--------------------------------------------------------------------------
+*/
+Route::get('/metrics', [MetricsController::class, 'index'])
+    ->name('metrics.index');
 
-Route::get('/metrics', [MetricsController::class, 'index']);
+/*
+|--------------------------------------------------------------------------
+| Core Modules
+|--------------------------------------------------------------------------
+*/
 
-// Report Controller Routes Starts here ...............................
-Route::get('expense/report', [ReportController::class, 'expenseIndex'])->name('reports.expense');
-Route::get('sales/report', [ReportController::class, 'salesIndex'])->name('reports.sales');
-Route::get('purchases/report', [ReportController::class, 'purchaseIndex'])->name('reports.purchase');
-Route::get('ledger/report', [ReportController::class, 'Index'])->name('reports.ledger');
+Route::get('/purchases', [PurchaseController::class, 'index'])
+    ->name('purchases.index');
+
+Route::get('/sales', [SaleController::class, 'index'])
+    ->name('sales.index');
+
+Route::get('/expenses', [ExpenseController::class, 'index'])
+    ->name('expenses.index');
+
+/*
+|--------------------------------------------------------------------------
+| Reports (Nested)
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('reports')->name('reports.')->group(function () {
+
+    Route::get('/ledger-heads', [ReportController::class, 'ledgerHeads'])
+        ->name('ledger-heads');
+
+    Route::get('/balance-sheet', [ReportController::class, 'balanceSheet'])
+        ->name('balance-sheet');
+
+    Route::get('/ledger-entries', [ReportController::class, 'ledgerEntries'])
+        ->name('ledger-entries');
+});

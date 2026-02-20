@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Sales Report')
-@section('page-title', 'Sales Report')
+@section('title', 'Purchase Report')
+@section('page-title', 'Purchase Report')
 
 @section('content')
     <div class="bg-white p-6 rounded-xl shadow">
 
         <div class="flex justify-between mb-4">
-            <h2 class="text-lg font-semibold">Sales List</h2>
+            <h2 class="text-lg font-semibold">Purchase List</h2>
             <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
                 Export PDF
             </button>
@@ -19,29 +19,27 @@
                 <thead class="bg-gray-100">
                 <tr>
                     <th class="p-3 border">#</th>
-                    <th class="p-3 border">Customer</th>
+                    <th class="p-3 border">Supplier</th>
                     <th class="p-3 border">Product</th>
                     <th class="p-3 border">Qty</th>
                     <th class="p-3 border">Unit Price</th>
                     <th class="p-3 border">Line Total</th>
-                    <th class="p-3 border">Sale Total</th>
+                    <th class="p-3 border">Purchase Total</th>
                     <th class="p-3 border">Date</th>
                 </tr>
                 </thead>
 
                 <tbody>
-                @forelse($sales as $sale)
-
-                    @foreach($sale->product_info as $index => $product)
+                @forelse($purchases as $purchase)
+                    @foreach($purchase->product_info as $index => $product)
                         <tr class="hover:bg-gray-50">
-
                             @if($index === 0)
-                                <td class="p-3 border" rowspan="{{ count($sale->product_info) }}">
-                                    {{ $sales->firstItem() + $loop->parent->index }}
+                                <td class="p-3 border" rowspan="{{ count($purchase->product_info) }}">
+                                    {{ $purchases->firstItem() + $loop->parent->index }}
                                 </td>
 
-                                <td class="p-3 border" rowspan="{{ count($sale->product_info) }}">
-                                    {{ $sale->customer->name ?? 'N/A' }}
+                                <td class="p-3 border" rowspan="{{ count($purchase->product_info) }}">
+                                    {{ $purchase->supplier->name ?? 'N/A' }}
                                 </td>
                             @endif
 
@@ -63,13 +61,13 @@
 
                             @if($index === 0)
                                 <td class="p-3 border text-right font-semibold"
-                                    rowspan="{{ count($sale->product_info) }}">
-                                    {{ number_format($sale->total_price, 2) }}
+                                    rowspan="{{ count($purchase->product_info) }}">
+                                    {{ number_format($purchase->total_price, 2) }}
                                 </td>
 
                                 <td class="p-3 border"
-                                    rowspan="{{ count($sale->product_info) }}">
-                                    {{ $sale->selling_date->format('Y-m-d H:i') }}
+                                    rowspan="{{ count($purchase->product_info) }}">
+                                    {{ $purchase->purchase_date->format('Y-m-d H:i') }}
                                 </td>
                             @endif
 
@@ -90,7 +88,7 @@
 
         <!-- Pagination -->
         <div class="mt-6">
-            {{ $sales->links() }}
+            {{ $purchases->links() }}
         </div>
 
     </div>
