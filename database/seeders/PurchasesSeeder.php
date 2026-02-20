@@ -27,7 +27,7 @@ class PurchasesSeeder extends Seeder
                 $purchaseData[] = [
                     'code' => 'P' . time() . rand(1000, 9999) . $i,
                     'branch_id' => $branchId,
-                    'supplier_id' => $faker->numberBetween(1, 50000),
+                    'supplier_id' => $faker->numberBetween(1, 1000),
                     'product_info' => json_encode($products),
                     'purchase_date' => $faker->dateTimeBetween($startDate, $endDate),
                     'total_price' => $faker->numberBetween(100, 10000),

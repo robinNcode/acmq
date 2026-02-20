@@ -24,7 +24,7 @@ class SalesSeeder extends Seeder
                 $salesData[] = [
                     'code' => 'S' . time() . rand(1000, 9999) . $i,
                     'branch_id' => $branchId,
-                    'customer_id' => $faker->numberBetween(1, 50000),
+                    'customer_id' => $faker->numberBetween(1, 20000),
                     'product_info' => json_encode($this->randomProductsList($faker->numberBetween(1, 10))),
                     'selling_date' => $faker->dateTimeBetween($startDate, $endDate),
                     'total_price' => $faker->numberBetween(100, 10000),

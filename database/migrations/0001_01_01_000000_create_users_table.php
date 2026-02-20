@@ -21,6 +21,13 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        DB::table('users')->insert([
+            'name' => 'Admin',
+            'email' => 'admin@acmq.com',
+            'email_verified_at' => now(),
+            'password' => bcrypt('acmq123')
+        ]);
+
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
