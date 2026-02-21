@@ -22,6 +22,9 @@ return new class extends Migration
             $table->string('product_code')->unique(); // SKU e.g., MED-0001
             $table->string('name');
             $table->string('category')->default('medicine'); // medicine, surgical, etc.
+            $table->string('type')->nullable(); // Tablet, Capsule, Syrup, etc.
+            $table->string('unit')->nullable(); // pcs, strip, bottle, tube, box
+            $table->string('manufacturer')->nullable();
 
             // Description
             $table->text('description')->nullable();
@@ -33,8 +36,8 @@ return new class extends Migration
             | purchase_price → inventory valuation
             | selling_price → revenue generation
             */
-            $table->decimal('purchase_price', 15, 2);
-            $table->decimal('selling_price', 15, 2);
+            $table->decimal('purchase_price', 15, 2)->default(0);
+            $table->decimal('selling_price', 15, 2)->default(0);
 
             /*
             |--------------------------------------------------------------------------
@@ -54,6 +57,14 @@ return new class extends Migration
             $table->unsignedBigInteger('inventory_account_id')->nullable();
             $table->unsignedBigInteger('cogs_account_id')->nullable();
             $table->unsignedBigInteger('revenue_account_id')->nullable();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Prescription and Status
+            |--------------------------------------------------------------------------
+            */
+            $table->boolean('is_prescription_required')->default(false);
+            $table->enum('status', ['draft', 'approved', 'archived'])->default('draft');
 
             /*
             |--------------------------------------------------------------------------

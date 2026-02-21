@@ -6,23 +6,6 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-/**
- * Class ProductSeeder
- *
- * Seeds the products table with medicine-type products commonly found in Bangladesh.
- *
- * Features:
- * - Realistic medicine names (generic + brand style)
- * - SKU generation
- * - Medicine type classification
- * - Unit-based products (pcs, bottle, box, strip)
- * - Manufacturer names (Bangladeshi pharma companies)
- * - Prescription requirement flag
- * - Proper decimal formatting for price (15,2)
- * - Controlled stock quantities
- *
- * @package Database\Seeders
- */
 class ProductSeeder extends Seeder
 {
     /**
@@ -126,12 +109,14 @@ class ProductSeeder extends Seeder
             $products[] = [
                 'name'                       => $medicine['name'],
                 'type'                       => $medicine['type'],
-                'sku'                        => 'MED-' . strtoupper(Str::random(8)),
-                'description'                => 'Medicine commonly used in Bangladesh for general treatment purposes.',
-                'manufacturer'               => $manufacturers[array_rand($manufacturers)],
                 'unit'                       => $medicine['unit'],
-                'price'                      => number_format($medicine['price'], 2, '.', ''),
+                'manufacturer'               => $manufacturers[array_rand($manufacturers)],
+                'product_code'               => 'MED-' . strtoupper(Str::random(8)),
+                'description'                => 'Medicine commonly used in Bangladesh for general treatment purposes.',
+                'purchase_price'             => number_format($medicine['price'] * 0.8, 2, '.', ''), // example: 80% of selling
+                'selling_price'              => number_format($medicine['price'], 2, '.', ''),
                 'stock_quantity'             => rand(50, 500),
+                'stock_value'                => 0, // can calculate after seeding: stock_quantity * purchase_price
                 'is_prescription_required'   => $medicine['rx'],
                 'status'                     => 'approved',
                 'entry_by'                   => $entryBy,
