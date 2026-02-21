@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Faker\Factory as Faker;
 use Carbon\Carbon;
 
-class PurchasesSeeder extends Seeder
+class PurchaseSeeder extends Seeder
 {
     public function run(): void
     {
@@ -16,7 +16,7 @@ class PurchasesSeeder extends Seeder
         $startDate = Carbon::now()->subMonth()->startOfMonth();
         $endDate = Carbon::now()->subMonth()->endOfMonth();
 
-        $salesSeeder = new SalesSeeder();
+        $salesSeeder = new SaleSeeder();
         $supplierIds = DB::table('suppliers')->pluck('id')->toArray();
 
         foreach ($branches as $branchId) {

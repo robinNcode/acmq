@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Faker\Factory as Faker;
 use Carbon\Carbon;
 
-class SalesSeeder extends Seeder
+class SaleSeeder extends Seeder
 {
     public function run()
     {
