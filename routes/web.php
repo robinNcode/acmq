@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BranchController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\MetricsController;
 use App\Http\Controllers\PurchaseController;
@@ -34,6 +35,9 @@ Route::get('/metrics', [MetricsController::class, 'index'])
 | Core Modules
 |--------------------------------------------------------------------------
 */
+
+Route::get('/branches', [BranchController::class, 'index'])->name('branches.index');
+Route::get('/branches/new', [BranchController::class, 'create'])->name('branches.create');
 
 Route::get('/purchases', [PurchaseController::class, 'index'])
     ->name('purchases.index');

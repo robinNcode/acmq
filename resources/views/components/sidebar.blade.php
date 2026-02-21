@@ -11,6 +11,12 @@
             Dashboard
         </a>
 
+        <!-- Branches -->
+        <a href="{{ route('branches.index') }}"
+           class="block p-2 rounded hover:bg-secondary transition">
+            Branches
+        </a>
+
         <!-- Purchases -->
         <a href="{{ route('purchases.index') }}"
            class="block p-2 rounded hover:bg-secondary transition">
