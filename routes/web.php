@@ -6,6 +6,8 @@ use App\Http\Controllers\MetricsController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,13 +16,8 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    return view('dashboard');
-});
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
+Route::get('/', [\App\Http\Controllers\DashboardController::class, 'index']);
+Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
 /*
 |--------------------------------------------------------------------------
@@ -36,17 +33,18 @@ Route::get('/metrics', [MetricsController::class, 'index'])
 |--------------------------------------------------------------------------
 */
 
-Route::get('/branches', [BranchController::class, 'index'])->name('branches.index');
-Route::get('/branches/new', [BranchController::class, 'create'])->name('branches.create');
+Route::resource('branches', BranchController::class);
+Route::resource('products', ProductController::class);
+Route::resource('purchases', PurchaseController::class);
+Route::resource('sales', SaleController::class);
+Route::resource('expenses', ExpenseController::class);
 
-Route::get('/purchases', [PurchaseController::class, 'index'])
-    ->name('purchases.index');
+Route::get('sales/{sale}/invoice', [SaleController::class, 'invoice'])->name('sales.invoice');
 
-Route::get('/sales', [SaleController::class, 'index'])
-    ->name('sales.index');
-
-Route::get('/expenses', [ExpenseController::class, 'index'])
-    ->name('expenses.index');
+Route::get('/accounts', [AccountController::class, 'index'])->name('accounts.index');
+Route::post('/accounts', [AccountController::class, 'store'])->name('accounts.store');
+Route::put('/accounts/{account}', [AccountController::class, 'update'])->name('accounts.update');
+Route::delete('/accounts/{account}', [AccountController::class, 'destroy'])->name('accounts.destroy');
 
 /*
 |--------------------------------------------------------------------------
@@ -56,12 +54,15 @@ Route::get('/expenses', [ExpenseController::class, 'index'])
 
 Route::prefix('reports')->name('reports.')->group(function () {
 
-    Route::get('/ledger-heads', [ReportController::class, 'ledgerHeads'])
-        ->name('ledger-heads');
-
     Route::get('/balance-sheet', [ReportController::class, 'balanceSheet'])
         ->name('balance-sheet');
 
     Route::get('/ledger-entries', [ReportController::class, 'ledgerEntries'])
         ->name('ledger-entries');
+        
+    Route::get('/trial-balance', [ReportController::class, 'trialBalance'])
+        ->name('trial-balance');
+
+    Route::get('/income-statement', [ReportController::class, 'incomeStatement'])
+        ->name('income-statement');
 });
