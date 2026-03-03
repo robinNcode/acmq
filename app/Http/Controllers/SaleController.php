@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\SaleService;
+use Illuminate\Support\Facades\DB;
 
 class SaleController extends Controller
 {
@@ -18,17 +19,18 @@ class SaleController extends Controller
     {
         $sales = $this->saleService->getPaginatedSales(30);
         $customers = $this->saleService->getCustomers();
-        // Just directly fetching branches mapping to DB here to avoid cross-domain DI
-        $branches = \Illuminate\Support\Facades\DB::table('branches')->orderBy('name')->get();
-        
-        return view('sales.index', compact('sales', 'customers', 'branches'));
+        $branches = DB::table('branches')->orderBy('name')->get();
+        $products = DB::table('products')->whereNull('deleted_at')->orderBy('name')->get();
+
+        return view('sales.index', compact('sales', 'customers', 'branches', 'products'));
     }
 
     public function create()
     {
         $customers = $this->saleService->getCustomers();
-        $branches = \Illuminate\Support\Facades\DB::table('branches')->orderBy('name')->get();
-        return view('sales.form', compact('customers', 'branches'));
+        $branches = DB::table('branches')->orderBy('name')->get();
+        $products = DB::table('products')->whereNull('deleted_at')->orderBy('name')->get();
+        return view('sales.form', compact('customers', 'branches', 'products'));
     }
 
     public function store(Request $request)
@@ -38,18 +40,20 @@ class SaleController extends Controller
             'branch_id' => 'required|integer',
             'customer_id' => 'required|integer',
             'selling_date' => 'required|date',
-            'total_price' => 'required|numeric',
             'discount' => 'required|numeric',
             'paid' => 'required|numeric',
             'due' => 'required|numeric',
-            'product_info' => 'nullable|string',
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|integer',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.unit_price' => 'required|numeric|min:0',
         ]);
 
-        if(!empty($data['product_info'])) {
-            $data['product_info'] = json_decode($data['product_info'], true) ?? [];
-        } else {
-            $data['product_info'] = [];
-        }
+        $data['product_info'] = $data['items'];
+        $data['total_price'] = collect($data['items'])->sum(function ($item) {
+            return $item['quantity'] * $item['unit_price'];
+        });
+        unset($data['items']);
 
         $this->saleService->createSale($data);
 
@@ -65,9 +69,10 @@ class SaleController extends Controller
     {
         $sale = $this->saleService->getSaleById($id);
         $customers = $this->saleService->getCustomers();
-        $branches = \Illuminate\Support\Facades\DB::table('branches')->orderBy('name')->get();
-        
-        return view('sales.form', compact('sale', 'customers', 'branches'));
+        $branches = DB::table('branches')->orderBy('name')->get();
+        $products = DB::table('products')->whereNull('deleted_at')->orderBy('name')->get();
+
+        return view('sales.form', compact('sale', 'customers', 'branches', 'products'));
     }
 
     public function update(Request $request, string $id)
@@ -79,18 +84,20 @@ class SaleController extends Controller
             'branch_id' => 'required|integer',
             'customer_id' => 'required|integer',
             'selling_date' => 'required|date',
-            'total_price' => 'required|numeric',
             'discount' => 'required|numeric',
             'paid' => 'required|numeric',
             'due' => 'required|numeric',
-            'product_info' => 'nullable|string',
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|integer',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.unit_price' => 'required|numeric|min:0',
         ]);
 
-        if(!empty($data['product_info'])) {
-            $data['product_info'] = json_decode($data['product_info'], true) ?? [];
-        } else {
-            $data['product_info'] = [];
-        }
+        $data['product_info'] = $data['items'];
+        $data['total_price'] = collect($data['items'])->sum(function ($item) {
+            return $item['quantity'] * $item['unit_price'];
+        });
+        unset($data['items']);
 
         $this->saleService->updateSale($id, $data);
 
@@ -103,5 +110,15 @@ class SaleController extends Controller
 
         return redirect()->route('sales.index')->with('success', 'Sale deleted successfully.');
     }
+
+    public function invoice(string $id)
+    {
+        $sale = $this->saleService->getSaleById($id);
+        $sale->load(['customer', 'branch']);
+        $products = DB::table('products')->whereNull('deleted_at')->get()->keyBy('id');
+
+        return view('sales.invoice', compact('sale', 'products'));
+    }
 }
+
 

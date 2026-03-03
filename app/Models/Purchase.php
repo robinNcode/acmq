@@ -3,12 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use LaravelIdea\Helper\App\Models\_IH_Purchase_C;
-use LaravelIdea\Helper\App\Models\_IH_Sale_C;
 
 class Purchase extends Model
 {
@@ -30,12 +27,12 @@ class Purchase extends Model
     ];
 
     protected $casts = [
-        'product_info' => 'array',
+        'product_info'  => 'array',
         'purchase_date' => 'datetime',
-        'price'        => 'decimal:2',
-        'total_price'  => 'decimal:2',
-        'quantity'     => 'integer',
-        'created_at' => 'datetime',
+        'total_price'   => 'decimal:2',
+        'discount'      => 'decimal:2',
+        'paid'          => 'decimal:2',
+        'due'           => 'decimal:2',
     ];
 
     public function product(): BelongsTo
@@ -43,19 +40,25 @@ class Purchase extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
     public static function getPurchaseReport(?int $branch_id = null)
     {
         return self::query()
-            ->with(['product', 'supplier'])
+            ->with(['product', 'supplier', 'branch'])
             ->when($branch_id, function ($q) use ($branch_id) {
                 $q->where('branch_id', $branch_id);
             })
             ->orderByDesc('purchase_date')
             ->paginate(self::PER_PAGE);
     }
-
-    public function supplier(): BelongsTo
-    {
-        return $this->belongsTo(Supplier::class);
-    }
 }
+

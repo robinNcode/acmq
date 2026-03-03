@@ -7,6 +7,7 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,9 +34,12 @@ Route::get('/metrics', [MetricsController::class, 'index'])
 */
 
 Route::resource('branches', BranchController::class);
+Route::resource('products', ProductController::class);
 Route::resource('purchases', PurchaseController::class);
 Route::resource('sales', SaleController::class);
 Route::resource('expenses', ExpenseController::class);
+
+Route::get('sales/{sale}/invoice', [SaleController::class, 'invoice'])->name('sales.invoice');
 
 Route::get('/accounts', [AccountController::class, 'index'])->name('accounts.index');
 Route::post('/accounts', [AccountController::class, 'store'])->name('accounts.store');

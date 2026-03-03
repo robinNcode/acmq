@@ -13,6 +13,6 @@ class PurchaseRepository extends BaseRepository implements PurchaseRepositoryInt
 
     public function paginate($perPage = 30)
     {
-        return $this->model->with(['supplier'])->orderBy('id', 'desc')->paginate($perPage);
+        return $this->model->with(['supplier', 'branch'])->orderBy('id', 'desc')->paginate($perPage);
     }
 }

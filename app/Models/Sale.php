@@ -8,21 +8,26 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use App\Models\Customer;
-use LaravelIdea\Helper\App\Models\_IH_Sale_C;
+use App\Models\Branch;
 
-/**
- * Class SaleController
- *
- * Handles sale report fetching with optional branch filtering.
- *
- * @package App\Models
- */
 class Sale extends Model
 {
     use SoftDeletes;
 
     const PER_PAGE = 20;
     protected $table = 'sales';
+
+    protected $fillable = [
+        'code',
+        'branch_id',
+        'customer_id',
+        'product_info',
+        'selling_date',
+        'total_price',
+        'discount',
+        'paid',
+        'due',
+    ];
 
     protected $casts = [
         'product_info' => 'array',
@@ -33,18 +38,10 @@ class Sale extends Model
         'due'          => 'decimal:2',
     ];
 
-    /**
-     * Fetch sales report filtered by branch ID.
-     *
-     * If branch ID is null, returns all sales.
-     *
-     * @param int|null $branchId
-     * @return LengthAwarePaginator|\Illuminate\Pagination\LengthAwarePaginator|_IH_Sale_C|Sale[]
-     */
-    public static function getSaleReport(?int $branchId = null): array|LengthAwarePaginator|\Illuminate\Pagination\LengthAwarePaginator|_IH_Sale_C
+    public static function getSaleReport(?int $branchId = null)
     {
         return self::query()
-            ->with(['customer'])
+            ->with(['customer', 'branch'])
             ->when($branchId, function ($q) use ($branchId) {
                 $q->where('branch_id', $branchId);
             })
@@ -52,13 +49,14 @@ class Sale extends Model
             ->paginate(self::PER_PAGE);
     }
 
-    /**
-     * CustomerController relationship.
-     *
-     * @return BelongsTo
-     */
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
 }
+

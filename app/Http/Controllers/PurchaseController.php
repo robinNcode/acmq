@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\PurchaseService;
+use Illuminate\Support\Facades\DB;
 
 class PurchaseController extends Controller
 {
@@ -18,15 +19,17 @@ class PurchaseController extends Controller
     {
         $purchases = $this->purchaseService->getPaginatedPurchases(30);
         $suppliers = $this->purchaseService->getSuppliers();
-        $branches = \Illuminate\Support\Facades\DB::table('branches')->orderBy('name')->get();
-        return view('purchases.index', compact('purchases', 'suppliers', 'branches'));
+        $branches = DB::table('branches')->orderBy('name')->get();
+        $products = DB::table('products')->whereNull('deleted_at')->orderBy('name')->get();
+        return view('purchases.index', compact('purchases', 'suppliers', 'branches', 'products'));
     }
 
     public function create()
     {
         $suppliers = $this->purchaseService->getSuppliers();
-        $branches = \Illuminate\Support\Facades\DB::table('branches')->orderBy('name')->get();
-        return view('purchases.form', compact('suppliers', 'branches'));
+        $branches = DB::table('branches')->orderBy('name')->get();
+        $products = DB::table('products')->whereNull('deleted_at')->orderBy('name')->get();
+        return view('purchases.form', compact('suppliers', 'branches', 'products'));
     }
 
     public function store(Request $request)
@@ -36,18 +39,20 @@ class PurchaseController extends Controller
             'branch_id' => 'required|integer',
             'supplier_id' => 'required|integer',
             'purchase_date' => 'required|date',
-            'total_price' => 'required|numeric',
             'discount' => 'required|numeric',
             'paid' => 'required|numeric',
             'due' => 'required|numeric',
-            'product_info' => 'nullable|string',
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|integer',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.unit_price' => 'required|numeric|min:0',
         ]);
 
-        if(!empty($data['product_info'])) {
-            $data['product_info'] = json_decode($data['product_info'], true) ?? [];
-        } else {
-            $data['product_info'] = [];
-        }
+        $data['product_info'] = $data['items'];
+        $data['total_price'] = collect($data['items'])->sum(function ($item) {
+            return $item['quantity'] * $item['unit_price'];
+        });
+        unset($data['items']);
 
         $this->purchaseService->createPurchase($data);
 
@@ -63,8 +68,9 @@ class PurchaseController extends Controller
     {
         $purchase = $this->purchaseService->getPurchaseById($id);
         $suppliers = $this->purchaseService->getSuppliers();
-        $branches = \Illuminate\Support\Facades\DB::table('branches')->orderBy('name')->get();
-        return view('purchases.form', compact('purchase', 'suppliers', 'branches'));
+        $branches = DB::table('branches')->orderBy('name')->get();
+        $products = DB::table('products')->whereNull('deleted_at')->orderBy('name')->get();
+        return view('purchases.form', compact('purchase', 'suppliers', 'branches', 'products'));
     }
 
     public function update(Request $request, string $id)
@@ -76,18 +82,20 @@ class PurchaseController extends Controller
             'branch_id' => 'required|integer',
             'supplier_id' => 'required|integer',
             'purchase_date' => 'required|date',
-            'total_price' => 'required|numeric',
             'discount' => 'required|numeric',
             'paid' => 'required|numeric',
             'due' => 'required|numeric',
-            'product_info' => 'nullable|string',
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|integer',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.unit_price' => 'required|numeric|min:0',
         ]);
 
-        if(!empty($data['product_info'])) {
-            $data['product_info'] = json_decode($data['product_info'], true) ?? [];
-        } else {
-            $data['product_info'] = [];
-        }
+        $data['product_info'] = $data['items'];
+        $data['total_price'] = collect($data['items'])->sum(function ($item) {
+            return $item['quantity'] * $item['unit_price'];
+        });
+        unset($data['items']);
 
         $this->purchaseService->updatePurchase($id, $data);
 
@@ -101,4 +109,3 @@ class PurchaseController extends Controller
         return redirect()->route('purchases.index')->with('success', 'Purchase deleted successfully.');
     }
 }
-

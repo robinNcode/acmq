@@ -20,10 +20,22 @@ class Product extends Model
     protected $table = 'products';
 
     protected $fillable = [
+        'product_code',
         'name',
+        'category',
+        'type',
+        'unit',
+        'manufacturer',
         'description',
-        'price',
+        'purchase_price',
+        'selling_price',
         'stock_quantity',
+        'stock_value',
+        'inventory_account_id',
+        'cogs_account_id',
+        'revenue_account_id',
+        'is_prescription_required',
+        'status',
         'entry_by',
         'approved_by'
     ];
