@@ -18,11 +18,15 @@ class Purchase extends Model
     const PER_PAGE = 20;
 
     protected $fillable = [
-        'product_id',
-        'quantity',
-        'price',
+        'code',
+        'branch_id',
+        'supplier_id',
+        'product_info',
+        'purchase_date',
         'total_price',
-        'branch_id'
+        'discount',
+        'paid',
+        'due'
     ];
 
     protected $casts = [
@@ -39,7 +43,7 @@ class Purchase extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public static function getPurchaseReport(?int $branch_id = null): array|LengthAwarePaginator|\Illuminate\Pagination\LengthAwarePaginator|_IH_Sale_C
+    public static function getPurchaseReport(?int $branch_id = null)
     {
         return self::query()
             ->with(['product', 'supplier'])

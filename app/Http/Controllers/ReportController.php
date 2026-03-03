@@ -1,15 +1,17 @@
 <?php namespace App\Http\Controllers;
 
 use App\Models\Sale;
+use App\Models\Account;
+use App\Models\JournalEntry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller{
 
-    public Sale $sale;
+    public $sale;
     public function __construct()
     {
-        $sale = new Sale();
+        $this->sale = new Sale();
     }
 
     public function index()
@@ -29,5 +31,86 @@ class ReportController extends Controller{
 
     public function salesIndex(){
 
+    }
+
+    public function ledgerEntries(Request $request)
+    {
+        $query = JournalEntry::with(['journal', 'account'])->orderBy('id', 'desc');
+
+        if ($request->filled('account_id')) {
+            $query->where('account_id', $request->account_id);
+        }
+
+        if ($request->filled('start_date')) {
+            $query->whereHas('journal', function($q) use ($request) {
+                $q->where('date', '>=', $request->start_date);
+            });
+        }
+
+        if ($request->filled('end_date')) {
+            $query->whereHas('journal', function($q) use ($request) {
+                $q->where('date', '<=', $request->end_date);
+            });
+        }
+
+        $entries = $query->paginate(50);
+        $accounts = Account::orderBy('name')->get();
+
+        return view('reports.ledger-entries', compact('entries', 'accounts'));
+    }
+
+    public function trialBalance(Request $request)
+    {
+        $accounts = Account::withSum('journalEntries as total_debit', 'debit')
+                           ->withSum('journalEntries as total_credit', 'credit')
+                           ->get();
+
+        return view('reports.trial-balance', compact('accounts'));
+    }
+
+    public function incomeStatement(Request $request)
+    {
+        $incomeAccounts = Account::where('type', 'income')
+            ->withSum('journalEntries as total_credit', 'credit')
+            ->withSum('journalEntries as total_debit', 'debit')
+            ->get();
+            
+        $expenseAccounts = Account::where('type', 'expense')
+            ->withSum('journalEntries as total_debit', 'debit')
+            ->withSum('journalEntries as total_credit', 'credit')
+            ->get();
+            
+        return view('reports.income-statement', compact('incomeAccounts', 'expenseAccounts'));
+    }
+
+    public function balanceSheet(Request $request)
+    {
+        $assetAccounts = Account::where('type', 'asset')
+            ->withSum('journalEntries as total_debit', 'debit')
+            ->withSum('journalEntries as total_credit', 'credit')
+            ->get();
+
+        $liabilityAccounts = Account::where('type', 'liability')
+            ->withSum('journalEntries as total_credit', 'credit')
+            ->withSum('journalEntries as total_debit', 'debit')
+            ->get();
+
+        $equityAccounts = Account::where('type', 'equity')
+            ->withSum('journalEntries as total_credit', 'credit')
+            ->withSum('journalEntries as total_debit', 'debit')
+            ->get();
+            
+        // Calculate Net Income to add to Equity. Getting all income/expense accounts entries sum.
+        $totalIncome = Account::where('type', 'income')->get()->sum(function($acc) {
+            return $acc->journalEntries()->sum('credit') - $acc->journalEntries()->sum('debit');
+        });
+        
+        $totalExpense = Account::where('type', 'expense')->get()->sum(function($acc) {
+            return $acc->journalEntries()->sum('debit') - $acc->journalEntries()->sum('credit');
+        });
+        
+        $netIncome = $totalIncome - $totalExpense;
+
+        return view('reports.balance-sheet', compact('assetAccounts', 'liabilityAccounts', 'equityAccounts', 'netIncome'));
     }
 }

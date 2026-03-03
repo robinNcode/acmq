@@ -10,57 +10,70 @@ class ExpenseController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $expenses = DB::table('expenses')->paginate(30);
-        return view('reports.expense_report', ['expenses' => $expenses]);
+        $expenses = \App\Models\Expense::with(['branch'])->orderBy('id', 'desc')->paginate(30);
+        $branches = \Illuminate\Support\Facades\DB::table('branches')->orderBy('name')->get();
+        return view('expenses.index', compact('expenses', 'branches'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $branches = \Illuminate\Support\Facades\DB::table('branches')->orderBy('name')->get();
+        return view('expenses.form', compact('branches'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'branch_id' => 'required|integer',
+            'amount' => 'required|numeric|min:0',
+            'particulars' => 'required|string|max:255',
+            'date' => 'required|date',
+            'entry_by' => 'nullable|integer',
+            'approved_by' => 'nullable|integer',
+        ]);
+
+        \App\Models\Expense::create($data);
+
+        return redirect()->route('expenses.index')->with('success', 'Expense created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        //
+        return redirect()->route('expenses.index');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
-        //
+        $expense = \App\Models\Expense::findOrFail($id);
+        $branches = \Illuminate\Support\Facades\DB::table('branches')->orderBy('name')->get();
+        return view('expenses.form', compact('expense', 'branches'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
-        //
+        $expense = \App\Models\Expense::findOrFail($id);
+
+        $data = $request->validate([
+            'branch_id' => 'required|integer',
+            'amount' => 'required|numeric|min:0',
+            'particulars' => 'required|string|max:255',
+            'date' => 'required|date',
+            'entry_by' => 'nullable|integer',
+            'approved_by' => 'nullable|integer',
+        ]);
+
+        $expense->update($data);
+
+        return redirect()->route('expenses.index')->with('success', 'Expense updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        //
+        $expense = \App\Models\Expense::findOrFail($id);
+        $expense->delete();
+
+        return redirect()->route('expenses.index')->with('success', 'Expense deleted successfully.');
     }
 }

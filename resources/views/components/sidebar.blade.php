@@ -54,19 +54,29 @@
             <!-- Nested Items -->
             <div x-show="openReports" x-transition class="ml-4 mt-2 space-y-1">
 
-                <a href="{{ route('reports.ledger-heads') }}"
-                   class="block p-2 rounded hover:bg-secondary transition">
-                    - Ledger Heads
-                </a>
-
-                <a href="{{ route('reports.balance-sheet') }}"
-                   class="block p-2 rounded hover:bg-secondary transition">
-                    - Balance Sheet
+                <a href="{{ route('accounts.index') }}"
+                   class="block p-2 rounded hover:bg-secondary transition border-l-2 border-transparent hover:border-accent">
+                    Ledger Heads
                 </a>
 
                 <a href="{{ route('reports.ledger-entries') }}"
-                   class="block p-2 rounded hover:bg-secondary transition">
-                    - Ledger Entries
+                   class="block p-2 rounded hover:bg-secondary transition border-l-2 border-transparent hover:border-accent">
+                    General Ledger
+                </a>
+
+                <a href="{{ route('reports.trial-balance') }}"
+                   class="block p-2 rounded hover:bg-secondary transition border-l-2 border-transparent hover:border-accent">
+                    Trial Balance
+                </a>
+
+                <a href="{{ route('reports.income-statement') }}"
+                   class="block p-2 rounded hover:bg-secondary transition border-l-2 border-transparent hover:border-accent">
+                    Income Statement
+                </a>
+
+                <a href="{{ route('reports.balance-sheet') }}"
+                   class="block p-2 rounded hover:bg-secondary transition border-l-2 border-transparent hover:border-accent">
+                    Balance Sheet
                 </a>
 
             </div>

@@ -9,57 +9,91 @@ class SaleController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $sales = \App\Models\Sale::getSaleReport();
-        return view('reports.sales_report', ['sales' => $sales]);
+        $sales = \App\Models\Sale::with(['customer'])->orderBy('id', 'desc')->paginate(30);
+        $customers = \Illuminate\Support\Facades\DB::table('customers')->orderBy('name')->get();
+        $branches = \Illuminate\Support\Facades\DB::table('branches')->orderBy('name')->get();
+        return view('sales.index', compact('sales', 'customers', 'branches'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $customers = \Illuminate\Support\Facades\DB::table('customers')->orderBy('name')->get();
+        $branches = \Illuminate\Support\Facades\DB::table('branches')->orderBy('name')->get();
+        return view('sales.form', compact('customers', 'branches'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'code' => 'required|string|unique:sales,code|max:20',
+            'branch_id' => 'required|integer',
+            'customer_id' => 'required|integer',
+            'selling_date' => 'required|date',
+            'total_price' => 'required|numeric',
+            'discount' => 'required|numeric',
+            'paid' => 'required|numeric',
+            'due' => 'required|numeric',
+            'product_info' => 'nullable|string',
+        ]);
+
+        if(!empty($data['product_info'])) {
+            $data['product_info'] = json_decode($data['product_info'], true) ?? [];
+        } else {
+            $data['product_info'] = [];
+        }
+
+        \App\Models\Sale::create($data);
+
+        return redirect()->route('sales.index')->with('success', 'Sale created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        //
+        return redirect()->route('sales.index');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
-        //
+        $sale = \App\Models\Sale::findOrFail($id);
+        $customers = \Illuminate\Support\Facades\DB::table('customers')->orderBy('name')->get();
+        $branches = \Illuminate\Support\Facades\DB::table('branches')->orderBy('name')->get();
+        return view('sales.form', compact('sale', 'customers', 'branches'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
-        //
+        $sale = \App\Models\Sale::findOrFail($id);
+
+        $data = $request->validate([
+            'code' => 'required|string|max:20|unique:sales,code,' . $sale->id,
+            'branch_id' => 'required|integer',
+            'customer_id' => 'required|integer',
+            'selling_date' => 'required|date',
+            'total_price' => 'required|numeric',
+            'discount' => 'required|numeric',
+            'paid' => 'required|numeric',
+            'due' => 'required|numeric',
+            'product_info' => 'nullable|string',
+        ]);
+
+        if(!empty($data['product_info'])) {
+            $data['product_info'] = json_decode($data['product_info'], true) ?? [];
+        } else {
+            $data['product_info'] = [];
+        }
+
+        $sale->update($data);
+
+        return redirect()->route('sales.index')->with('success', 'Sale updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        //
+        $sale = \App\Models\Sale::findOrFail($id);
+        $sale->delete();
+
+        return redirect()->route('sales.index')->with('success', 'Sale deleted successfully.');
     }
 }

@@ -13,7 +13,7 @@ class PurchaseSeeder extends Seeder
     public function run(): void
     {
         $faker = Faker::create();
-        $branches = range(24, 200);
+        $branches = range(1, 50); // BranchSeeder creates 50 branches
         $startDate = Carbon::now()->subMonth()->startOfMonth();
         $endDate = Carbon::now()->subMonth()->endOfMonth();
 
@@ -25,9 +25,14 @@ class PurchaseSeeder extends Seeder
             return; // Prevent seeding if no data
         }
 
+        // Fetch Accounts for Double Entry
+        $cashAccId = DB::table('accounts')->where('code', '1100')->value('id');
+        $payableAccId = DB::table('accounts')->where('code', '2100')->value('id');
+        $purchaseExpenseAccId = DB::table('accounts')->where('code', '5100')->value('id');
+
         foreach ($branches as $branchId) {
-            $purchaseData = [];
-            $purchaseCount = rand(500, 600);
+            $purchaseCount = rand(10, 15);
+            $journalEntriesData = [];
 
             for ($i = 1; $i <= $purchaseCount; $i++) {
                 $products = $this->randomProductsList($faker->numberBetween(1, 10), $allProducts, $faker);
@@ -37,7 +42,7 @@ class PurchaseSeeder extends Seeder
                 $paid       = array_sum(array_column($products, 'paid'));
                 $due        = array_sum(array_column($products, 'due'));
 
-                $purchaseData[] = [
+                $purchaseData = [
                     'code'          => sprintf('PUR%03d%06d', $branchId, $i),
                     'branch_id'     => $branchId,
                     'supplier_id'   => $faker->randomElement($supplierIds),
@@ -51,9 +56,61 @@ class PurchaseSeeder extends Seeder
                     'updated_at'    => now(),
                     'deleted_at'    => null,
                 ];
+
+                $purchaseId = DB::table('purchases')->insertGetId($purchaseData);
+
+                // Create Journal
+                $journalId = DB::table('journals')->insertGetId([
+                    'branch_id'      => $branchId,
+                    'reference_type' => 'purchase',
+                    'reference_id'   => $purchaseId,
+                    'date'           => $purchaseData['purchase_date'],
+                    'description'    => 'Purchase ' . $purchaseData['code'],
+                    'created_by'     => 1,
+                    'created_at'     => now(),
+                    'updated_at'     => now(),
+                ]);
+
+                // Journal Entries for Purchase
+                // 1. Debit Purchase Expense for net_price
+                $journalEntriesData[] = [
+                    'journal_id' => $journalId,
+                    'account_id' => $purchaseExpenseAccId,
+                    'debit'      => $totalPrice,
+                    'credit'     => 0,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+
+                // 2. Credit Cash for paid
+                if ($paid > 0) {
+                    $journalEntriesData[] = [
+                        'journal_id' => $journalId,
+                        'account_id' => $cashAccId,
+                        'debit'      => 0,
+                        'credit'     => $paid,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+
+                // 3. Credit Accounts Payable for due
+                if ($due > 0) {
+                    $journalEntriesData[] = [
+                        'journal_id' => $journalId,
+                        'account_id' => $payableAccId,
+                        'debit'      => 0,
+                        'credit'     => $due,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
             }
 
-            DB::table('purchases')->insert($purchaseData);
+            // Batch insert journal entries efficiently
+            if (!empty($journalEntriesData)) {
+                DB::table('journal_entries')->insert($journalEntriesData);
+            }
         }
     }
 
