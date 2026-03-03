@@ -3,16 +3,20 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Services\ExpenseService;
 
 class ExpenseController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $expenseService;
+
+    public function __construct(ExpenseService $expenseService)
+    {
+        $this->expenseService = $expenseService;
+    }
+
     public function index(Request $request)
     {
-        $expenses = \App\Models\Expense::with(['branch'])->orderBy('id', 'desc')->paginate(30);
+        $expenses = $this->expenseService->getPaginatedExpenses(30);
         $branches = \Illuminate\Support\Facades\DB::table('branches')->orderBy('name')->get();
         return view('expenses.index', compact('expenses', 'branches'));
     }
@@ -34,7 +38,7 @@ class ExpenseController extends Controller
             'approved_by' => 'nullable|integer',
         ]);
 
-        \App\Models\Expense::create($data);
+        $this->expenseService->createExpense($data);
 
         return redirect()->route('expenses.index')->with('success', 'Expense created successfully.');
     }
@@ -46,14 +50,14 @@ class ExpenseController extends Controller
 
     public function edit(string $id)
     {
-        $expense = \App\Models\Expense::findOrFail($id);
+        $expense = $this->expenseService->getExpenseById($id);
         $branches = \Illuminate\Support\Facades\DB::table('branches')->orderBy('name')->get();
         return view('expenses.form', compact('expense', 'branches'));
     }
 
     public function update(Request $request, string $id)
     {
-        $expense = \App\Models\Expense::findOrFail($id);
+        $expense = $this->expenseService->getExpenseById($id);
 
         $data = $request->validate([
             'branch_id' => 'required|integer',
@@ -64,16 +68,16 @@ class ExpenseController extends Controller
             'approved_by' => 'nullable|integer',
         ]);
 
-        $expense->update($data);
+        $this->expenseService->updateExpense($id, $data);
 
         return redirect()->route('expenses.index')->with('success', 'Expense updated successfully.');
     }
 
     public function destroy(string $id)
     {
-        $expense = \App\Models\Expense::findOrFail($id);
-        $expense->delete();
+        $this->expenseService->deleteExpense($id);
 
         return redirect()->route('expenses.index')->with('success', 'Expense deleted successfully.');
     }
 }
+

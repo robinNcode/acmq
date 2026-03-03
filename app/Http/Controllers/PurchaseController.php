@@ -2,25 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Purchase;
 use Illuminate\Http\Request;
+use App\Services\PurchaseService;
 
 class PurchaseController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $purchaseService;
+
+    public function __construct(PurchaseService $purchaseService)
+    {
+        $this->purchaseService = $purchaseService;
+    }
+
     public function index(Request $request)
     {
-        $purchases = \App\Models\Purchase::with(['supplier'])->orderBy('id', 'desc')->paginate(30);
-        $suppliers = \Illuminate\Support\Facades\DB::table('suppliers')->orderBy('name')->get();
+        $purchases = $this->purchaseService->getPaginatedPurchases(30);
+        $suppliers = $this->purchaseService->getSuppliers();
         $branches = \Illuminate\Support\Facades\DB::table('branches')->orderBy('name')->get();
         return view('purchases.index', compact('purchases', 'suppliers', 'branches'));
     }
 
     public function create()
     {
-        $suppliers = \Illuminate\Support\Facades\DB::table('suppliers')->orderBy('name')->get();
+        $suppliers = $this->purchaseService->getSuppliers();
         $branches = \Illuminate\Support\Facades\DB::table('branches')->orderBy('name')->get();
         return view('purchases.form', compact('suppliers', 'branches'));
     }
@@ -45,7 +49,7 @@ class PurchaseController extends Controller
             $data['product_info'] = [];
         }
 
-        \App\Models\Purchase::create($data);
+        $this->purchaseService->createPurchase($data);
 
         return redirect()->route('purchases.index')->with('success', 'Purchase created successfully.');
     }
@@ -57,15 +61,15 @@ class PurchaseController extends Controller
 
     public function edit(string $id)
     {
-        $purchase = \App\Models\Purchase::findOrFail($id);
-        $suppliers = \Illuminate\Support\Facades\DB::table('suppliers')->orderBy('name')->get();
+        $purchase = $this->purchaseService->getPurchaseById($id);
+        $suppliers = $this->purchaseService->getSuppliers();
         $branches = \Illuminate\Support\Facades\DB::table('branches')->orderBy('name')->get();
         return view('purchases.form', compact('purchase', 'suppliers', 'branches'));
     }
 
     public function update(Request $request, string $id)
     {
-        $purchase = \App\Models\Purchase::findOrFail($id);
+        $purchase = $this->purchaseService->getPurchaseById($id);
 
         $data = $request->validate([
             'code' => 'required|string|max:20|unique:purchases,code,' . $purchase->id,
@@ -85,16 +89,16 @@ class PurchaseController extends Controller
             $data['product_info'] = [];
         }
 
-        $purchase->update($data);
+        $this->purchaseService->updatePurchase($id, $data);
 
         return redirect()->route('purchases.index')->with('success', 'Purchase updated successfully.');
     }
 
     public function destroy(string $id)
     {
-        $purchase = \App\Models\Purchase::findOrFail($id);
-        $purchase->delete();
+        $this->purchaseService->deletePurchase($id);
 
         return redirect()->route('purchases.index')->with('success', 'Purchase deleted successfully.');
     }
 }
+

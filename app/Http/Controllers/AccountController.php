@@ -2,14 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Account;
 use Illuminate\Http\Request;
+use App\Services\AccountService;
 
 class AccountController extends Controller
 {
+    protected $accountService;
+
+    public function __construct(AccountService $accountService)
+    {
+        $this->accountService = $accountService;
+    }
+
     public function index()
     {
-        $accounts = Account::orderBy('code')->get();
+        $accounts = $this->accountService->getAllAccounts();
         return view('accounts.index', compact('accounts'));
     }
 
@@ -22,13 +29,15 @@ class AccountController extends Controller
             'branch_id' => 'required|integer'
         ]);
 
-        Account::create($validated);
+        $this->accountService->createAccount($validated);
 
         return redirect()->route('accounts.index')->with('success', 'Account created successfully.');
     }
 
-    public function update(Request $request, Account $account)
+    public function update(Request $request, string $id)
     {
+        $account = $this->accountService->getAccountById($id);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:255|unique:accounts,code,' . $account->id,
@@ -36,19 +45,20 @@ class AccountController extends Controller
             'branch_id' => 'required|integer'
         ]);
 
-        $account->update($validated);
+        $this->accountService->updateAccount($id, $validated);
 
         return redirect()->route('accounts.index')->with('success', 'Account updated successfully.');
     }
 
-    public function destroy(Account $account)
+    public function destroy(string $id)
     {
-        if ($account->journalEntries()->exists()) {
+        $success = $this->accountService->deleteAccount($id);
+        
+        if (!$success) {
             return redirect()->route('accounts.index')->with('error', 'Cannot delete account with existing journal entries.');
         }
-        
-        $account->delete();
 
         return redirect()->route('accounts.index')->with('success', 'Account deleted successfully.');
     }
 }
+

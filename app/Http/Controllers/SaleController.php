@@ -3,23 +3,30 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Services\SaleService;
 
 class SaleController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $saleService;
+
+    public function __construct(SaleService $saleService)
+    {
+        $this->saleService = $saleService;
+    }
+
     public function index(Request $request)
     {
-        $sales = \App\Models\Sale::with(['customer'])->orderBy('id', 'desc')->paginate(30);
-        $customers = \Illuminate\Support\Facades\DB::table('customers')->orderBy('name')->get();
+        $sales = $this->saleService->getPaginatedSales(30);
+        $customers = $this->saleService->getCustomers();
+        // Just directly fetching branches mapping to DB here to avoid cross-domain DI
         $branches = \Illuminate\Support\Facades\DB::table('branches')->orderBy('name')->get();
+        
         return view('sales.index', compact('sales', 'customers', 'branches'));
     }
 
     public function create()
     {
-        $customers = \Illuminate\Support\Facades\DB::table('customers')->orderBy('name')->get();
+        $customers = $this->saleService->getCustomers();
         $branches = \Illuminate\Support\Facades\DB::table('branches')->orderBy('name')->get();
         return view('sales.form', compact('customers', 'branches'));
     }
@@ -44,7 +51,7 @@ class SaleController extends Controller
             $data['product_info'] = [];
         }
 
-        \App\Models\Sale::create($data);
+        $this->saleService->createSale($data);
 
         return redirect()->route('sales.index')->with('success', 'Sale created successfully.');
     }
@@ -56,15 +63,16 @@ class SaleController extends Controller
 
     public function edit(string $id)
     {
-        $sale = \App\Models\Sale::findOrFail($id);
-        $customers = \Illuminate\Support\Facades\DB::table('customers')->orderBy('name')->get();
+        $sale = $this->saleService->getSaleById($id);
+        $customers = $this->saleService->getCustomers();
         $branches = \Illuminate\Support\Facades\DB::table('branches')->orderBy('name')->get();
+        
         return view('sales.form', compact('sale', 'customers', 'branches'));
     }
 
     public function update(Request $request, string $id)
     {
-        $sale = \App\Models\Sale::findOrFail($id);
+        $sale = $this->saleService->getSaleById($id);
 
         $data = $request->validate([
             'code' => 'required|string|max:20|unique:sales,code,' . $sale->id,
@@ -84,16 +92,16 @@ class SaleController extends Controller
             $data['product_info'] = [];
         }
 
-        $sale->update($data);
+        $this->saleService->updateSale($id, $data);
 
         return redirect()->route('sales.index')->with('success', 'Sale updated successfully.');
     }
 
     public function destroy(string $id)
     {
-        $sale = \App\Models\Sale::findOrFail($id);
-        $sale->delete();
+        $this->saleService->deleteSale($id);
 
         return redirect()->route('sales.index')->with('success', 'Sale deleted successfully.');
     }
 }
+

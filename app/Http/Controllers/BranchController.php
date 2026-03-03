@@ -3,16 +3,20 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Services\BranchService;
 
 class BranchController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $branchService;
+
+    public function __construct(BranchService $branchService)
+    {
+        $this->branchService = $branchService;
+    }
+
     public function index()
     {
-        $branches = \App\Models\Branch::orderBy('id', 'desc')->paginate(30);
+        $branches = $this->branchService->getPaginatedBranches(30);
         return view('branches.index', ['branches' => $branches]);
     }
 
@@ -32,7 +36,7 @@ class BranchController extends Controller
             'address' => 'nullable|string',
         ]);
 
-        \App\Models\Branch::create($data);
+        $this->branchService->createBranch($data);
 
         return redirect()->route('branches.index')->with('success', 'Branch created successfully.');
     }
@@ -44,13 +48,13 @@ class BranchController extends Controller
 
     public function edit(string $id)
     {
-        $branch = \App\Models\Branch::findOrFail($id);
+        $branch = $this->branchService->getBranchById($id);
         return view('branches.form', compact('branch'));
     }
 
     public function update(Request $request, string $id)
     {
-        $branch = \App\Models\Branch::findOrFail($id);
+        $branch = $this->branchService->getBranchById($id);
 
         $data = $request->validate([
             'branch_code' => 'required|string|max:10|unique:branches,branch_code,' . $branch->id,
@@ -61,16 +65,16 @@ class BranchController extends Controller
             'address' => 'nullable|string',
         ]);
 
-        $branch->update($data);
+        $this->branchService->updateBranch($id, $data);
 
         return redirect()->route('branches.index')->with('success', 'Branch updated successfully.');
     }
 
     public function destroy(string $id)
     {
-        $branch = \App\Models\Branch::findOrFail($id);
-        $branch->delete();
+        $this->branchService->deleteBranch($id);
 
         return redirect()->route('branches.index')->with('success', 'Branch deleted successfully.');
     }
 }
+
