@@ -1,56 +1,64 @@
+version: '3.9'
+
 services:
-    app:
-        build:
-            context: .
-            dockerfile: Dockerfile
-        container_name: acmq-app
-        ports:
-            - "7071:80"
-        volumes:
-            - ./:/var/www/html
-        environment:
-            - APACHE_DOCUMENT_ROOT=/var/www/html/public
-        networks:
-            - acmq_network
-    #        depends_on:
-    #            - db
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: acmq-app
+    ports:
+      - "7071:80"
+    volumes:
+      - ./:/var/www/html
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html/public
+    networks:
+      - acmq_network
 
-    #    db:
-    #        image: mysql:latest
-    #        container_name: acmq-dbcon
-    #        environment:
-    #            MYSQL_ROOT_PASSWORD: root_password
-    #            MYSQL_DATABASE: simple_api_db
-    #            MYSQL_USER: mfnextgen_ci4_user
-    #            MYSQL_PASSWORD: ci4password
-    #        ports:
-    #            - "3307:3306"
-    #        command: --default-authentication-plugin=mysql_native_password
-    #        networks:
-    #            - lara_network
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: acmq-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - app
+      - cadvisor
+    networks:
+      - acmq_network
 
-    prometheus:
-        image: prom/prometheus:latest
-        container_name: acmq-prometheus
-        ports:
-            - "9090:9090"
-        volumes:
-            - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-        depends_on:
-            - app
-        networks:
-            - acmq_network
+  grafana:
+    image: grafana/grafana:latest
+    container_name: acmq-grafana
+    ports:
+      - "3300:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    networks:
+      - acmq_network
 
-    grafana:
-        image: grafana/grafana:latest
-        container_name: acmq-grafana
-        ports:
-            - "3300:3000"
-        depends_on:
-            - prometheus
-        networks:
-            - acmq_network
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: acmq-cadvisor
+    ports:
+      - "7072:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - acmq_network
 
 networks:
-    acmq_network:
-        driver: bridge
+  acmq_network:
+    driver: bridge
+
+volumes:
+  grafana-storage:
