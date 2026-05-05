@@ -53,6 +53,8 @@ Route::delete('/accounts/{account}', [AccountController::class, 'destroy'])->nam
 */
 
 Route::prefix('reports')->name('reports.')->group(function () {
+    Route::get('/journal', [ReportController::class, 'journal'])
+        ->name('journal');
 
     Route::get('/balance-sheet', [ReportController::class, 'balanceSheet'])
         ->name('balance-sheet');

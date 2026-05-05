@@ -27,13 +27,13 @@
 </div>
 
 <!-- Tailwind CDN -->
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="{{ asset('public/vendor/js/tailwind.3.4.17.js') }}"></script>
 
 <!-- Alpine.js -->
-<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script defer src="{{ asset('public/vendor/js/alpinejs.cdn.min.js') }}"></script>
 
 <!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ asset('public/vendor/js/chart.js') }}"></script>
 
 <script>
     tailwind.config = {

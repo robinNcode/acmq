@@ -7,8 +7,10 @@ RUN apt-get update && apt-get install -y \
     vim \
     libjpeg-dev \
     libfreetype6-dev \
+    libicu-dev \
     libonig-dev \
     libxml2-dev \
+    pkg-config \
     zip \
     unzip \
     git \
