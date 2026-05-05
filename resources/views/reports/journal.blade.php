@@ -8,6 +8,9 @@
         <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Journal Report</h1>
         <p class="text-sm text-gray-500 mt-1">Review journal vouchers with debit and credit details.</p>
     </div>
+    <button type="button" onclick="window.print()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
+        Print This Page
+    </button>
 </div>
 
 <div class="bg-white p-6 rounded-xl border shadow-sm mb-6">
@@ -76,6 +79,7 @@
                 <div class="text-right text-sm">
                     <p><span class="text-gray-500">Branch:</span> {{ $journal->branch->name ?? ('#' . $journal->branch_id) }}</p>
                     <p><span class="text-gray-500">Ref:</span> {{ $journal->reference_type ?: 'N/A' }}{{ $journal->reference_id ? ' #' . $journal->reference_id : '' }}</p>
+                    <a href="{{ route('reports.journal.print', $journal->id) }}" target="_blank" class="inline-block mt-1 text-green-600 font-medium">Print Card</a>
                 </div>
             </div>
 

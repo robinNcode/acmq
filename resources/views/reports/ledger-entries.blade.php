@@ -8,6 +8,9 @@
         <h1 class="text-3xl font-bold text-gray-900 tracking-tight">General Ledger</h1>
         <p class="text-sm text-gray-500 mt-1">View detailed accounting entries and transactions.</p>
     </div>
+    <a href="{{ route('reports.ledger-entries.print', request()->query()) }}" target="_blank" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
+        Print
+    </a>
 </div>
 
 <div class="bg-white p-6 rounded-xl border shadow-sm mb-6">
