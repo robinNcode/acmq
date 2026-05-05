@@ -8,6 +8,9 @@
         <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Trial Balance</h1>
         <p class="text-sm text-gray-500 mt-1">Summary of all account balances to ensure debits equal credits.</p>
     </div>
+    <a href="{{ route('reports.trial-balance.print', request()->query()) }}" target="_blank" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
+        Print
+    </a>
 </div>
 
 <div class="bg-white border rounded-xl shadow-sm overflow-hidden mt-6">

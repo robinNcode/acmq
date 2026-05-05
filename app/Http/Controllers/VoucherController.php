@@ -104,8 +104,12 @@ class VoucherController extends Controller
             }
         }
 
-        $totalDebit = array_sum(array_map(fn($line) => (float) $line['debit'], $lines));
-        $totalCredit = array_sum(array_map(fn($line) => (float) $line['credit'], $lines));
+        $totalDebit = array_sum(array_map(function ($line) {
+            return (float) $line['debit'];
+        }, $lines));
+        $totalCredit = array_sum(array_map(function ($line) {
+            return (float) $line['credit'];
+        }, $lines));
         if (round($totalDebit, 2) !== round($totalCredit, 2)) {
             return back()->withErrors(['lines' => 'Voucher is not balanced. Total debit and credit must match.'])->withInput();
         }

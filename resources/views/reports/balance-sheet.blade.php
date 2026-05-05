@@ -3,9 +3,14 @@
 @section('title', 'Balance Sheet')
 
 @section('content')
-<div class="mb-6">
-    <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Balance Sheet</h1>
-    <p class="text-sm text-gray-500 mt-1">Snapshot of balances: Assets = Liabilities + Equity.</p>
+<div class="mb-6 flex items-center justify-between">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Balance Sheet</h1>
+        <p class="text-sm text-gray-500 mt-1">Snapshot of balances: Assets = Liabilities + Equity.</p>
+    </div>
+    <a href="{{ route('reports.balance-sheet.print', request()->query()) }}" target="_blank" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
+        Print
+    </a>
 </div>
 
 @php

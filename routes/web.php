@@ -8,6 +8,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\VoucherController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -53,6 +54,8 @@ Route::delete('/accounts/{account}', [AccountController::class, 'destroy'])->nam
 */
 
 Route::prefix('reports')->name('reports.')->group(function () {
+    Route::get('/journal/{journal}/print', [ReportController::class, 'printJournal'])
+        ->name('journal.print');
     Route::get('/journal', [ReportController::class, 'journal'])
         ->name('journal');
 
@@ -64,7 +67,23 @@ Route::prefix('reports')->name('reports.')->group(function () {
         
     Route::get('/trial-balance', [ReportController::class, 'trialBalance'])
         ->name('trial-balance');
+    Route::get('/trial-balance/print', [ReportController::class, 'trialBalancePrint'])
+        ->name('trial-balance.print');
 
     Route::get('/income-statement', [ReportController::class, 'incomeStatement'])
         ->name('income-statement');
+    Route::get('/income-statement/print', [ReportController::class, 'incomeStatementPrint'])
+        ->name('income-statement.print');
+    Route::get('/balance-sheet/print', [ReportController::class, 'balanceSheetPrint'])
+        ->name('balance-sheet.print');
+    Route::get('/ledger-entries/print', [ReportController::class, 'ledgerEntriesPrint'])
+        ->name('ledger-entries.print');
+});
+
+Route::prefix('vouchers')->name('vouchers.')->group(function () {
+    Route::get('/', [VoucherController::class, 'index'])->name('index');
+    Route::get('/create', [VoucherController::class, 'create'])->name('create');
+    Route::post('/', [VoucherController::class, 'store'])->name('store');
+    Route::get('/{id}', [VoucherController::class, 'show'])->name('show');
+    Route::get('/{id}/print', [VoucherController::class, 'print'])->name('print');
 });
