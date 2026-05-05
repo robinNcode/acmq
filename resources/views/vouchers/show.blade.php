@@ -8,9 +8,9 @@
         <h1 class="text-3xl font-bold text-gray-900">{{ strtoupper($voucher->reference_type) }} Voucher #{{ $voucher->id }}</h1>
         <p class="text-sm text-gray-500 mt-1">{{ $voucher->date }} | {{ $voucher->branch->name ?? ('#' . $voucher->branch_id) }}</p>
     </div>
-    <div>
-        <a target="_blank" href="{{ route('vouchers.print', $voucher->id) }}" class="px-4 py-2 rounded-lg bg-green-600 text-white">Print</a>
-    </div>
+    <a target="_blank" href="{{ route('vouchers.print', $voucher->id) }}" title="Print voucher" class="p-2 rounded-lg bg-green-600 text-white">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V2h12v7M6 18h12v4H6v-4z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 14H4a2 2 0 01-2-2v-1a2 2 0 012-2h16a2 2 0 012 2v1a2 2 0 01-2 2h-2"/></svg>
+    </a>
 </div>
 
 <div class="bg-white border rounded-xl shadow-sm overflow-hidden">

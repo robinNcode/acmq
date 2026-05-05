@@ -74,7 +74,9 @@
         <div>
             <div class="flex items-center justify-between mb-2">
                 <h2 class="font-semibold">JV Lines</h2>
-                <button type="button" id="add-line" class="px-3 py-1 text-sm rounded bg-indigo-600 text-white">Add Line</button>
+                <button type="button" id="add-line" title="Add line" class="p-2 text-sm rounded bg-indigo-600 text-white">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                </button>
             </div>
             <div id="lines" class="space-y-2">
                 @for($i=0; $i<3; $i++)
@@ -122,8 +124,12 @@
     @endif
 
     <div class="pt-2">
-        <button class="px-5 py-2 rounded-lg bg-indigo-600 text-white">Save Voucher</button>
-        <a href="{{ route('vouchers.index') }}" class="ml-3 text-gray-600">Cancel</a>
+        <button title="Save voucher" class="p-2 rounded-lg bg-indigo-600 text-white">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        </button>
+        <a href="{{ route('vouchers.index') }}" title="Cancel and go back" class="ml-3 inline-block p-2 rounded-lg bg-gray-200 text-gray-600">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </a>
     </div>
 </form>
 @endsection
