@@ -70,14 +70,10 @@ Route::prefix('reports')->name('reports.')->group(function () {
     Route::get('/trial-balance/print', [ReportController::class, 'trialBalancePrint'])
         ->name('trial-balance.print');
 
-    Route::get('/income-statement', [ReportController::class, 'incomeStatement'])
-        ->name('income-statement');
-    Route::get('/income-statement/print', [ReportController::class, 'incomeStatementPrint'])
-        ->name('income-statement.print');
-    Route::get('/balance-sheet/print', [ReportController::class, 'balanceSheetPrint'])
-        ->name('balance-sheet.print');
-    Route::get('/ledger-entries/print', [ReportController::class, 'ledgerEntriesPrint'])
-        ->name('ledger-entries.print');
+    Route::get('/income-statement', [ReportController::class, 'incomeStatement'])->name('income-statement');
+    Route::get('/income-statement/print', [ReportController::class, 'incomeStatementPrint'])->name('income-statement.print');
+    Route::get('/balance-sheet/print', [ReportController::class, 'balanceSheetPrint'])->name('balance-sheet.print');
+    Route::get('/ledger-entries/print', [ReportController::class, 'ledgerEntriesPrint'])->name('ledger-entries.print');
 });
 
 Route::prefix('vouchers')->name('vouchers.')->group(function () {

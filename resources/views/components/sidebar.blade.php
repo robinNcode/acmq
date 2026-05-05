@@ -8,37 +8,55 @@
         <!-- Dashboard -->
         <a href="{{ route('dashboard') }}"
            class="block p-2 rounded transition {{ request()->routeIs('dashboard') ? 'bg-secondary text-white font-semibold' : 'hover:bg-secondary' }}">
-            Dashboard
+            <span class="inline-flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3"/></svg>
+                <span>Dashboard</span>
+            </span>
         </a>
 
         <!-- Branches -->
         <a href="{{ route('branches.index') }}"
            class="block p-2 rounded transition {{ request()->routeIs('branches.*') ? 'bg-secondary text-white font-semibold' : 'hover:bg-secondary' }}">
-            Branches
+            <span class="inline-flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg>
+                <span>Branches</span>
+            </span>
         </a>
 
         <!-- Products -->
         <a href="{{ route('products.index') }}"
            class="block p-2 rounded transition {{ request()->routeIs('products.*') ? 'bg-secondary text-white font-semibold' : 'hover:bg-secondary' }}">
-            Products
+            <span class="inline-flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V7a2 2 0 00-2-2h-3V3H9v2H6a2 2 0 00-2 2v6m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4"/></svg>
+                <span>Products</span>
+            </span>
         </a>
 
         <!-- Purchases -->
         <a href="{{ route('purchases.index') }}"
            class="block p-2 rounded transition {{ request()->routeIs('purchases.*') ? 'bg-secondary text-white font-semibold' : 'hover:bg-secondary' }}">
-            Purchases
+            <span class="inline-flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 7h13"/></svg>
+                <span>Purchases</span>
+            </span>
         </a>
 
         <!-- Sales -->
         <a href="{{ route('sales.index') }}"
            class="block p-2 rounded transition {{ request()->routeIs('sales.*') ? 'bg-secondary text-white font-semibold' : 'hover:bg-secondary' }}">
-            Sales
+            <span class="inline-flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.2 0-4 1.3-4 3s1.8 3 4 3 4 1.3 4 3-1.8 3-4 3m0-12V4m0 16v-2"/></svg>
+                <span>Sales</span>
+            </span>
         </a>
 
         <!-- Expenses -->
         <a href="{{ route('expenses.index') }}"
            class="block p-2 rounded transition {{ request()->routeIs('expenses.*') ? 'bg-secondary text-white font-semibold' : 'hover:bg-secondary' }}">
-            Expenses
+            <span class="inline-flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l2 2 4-4m5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Expenses</span>
+            </span>
         </a>
 
         <!-- Reports (Nested Menu) -->

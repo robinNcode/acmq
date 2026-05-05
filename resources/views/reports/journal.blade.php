@@ -8,8 +8,8 @@
         <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Journal Report</h1>
         <p class="text-sm text-gray-500 mt-1">Review journal vouchers with debit and credit details.</p>
     </div>
-    <button type="button" onclick="window.print()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
-        Print This Page
+    <button type="button" onclick="window.print()" title="Print report" class="p-2 bg-green-600 hover:bg-green-700 text-white rounded-lg">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V2h12v7M6 18h12v4H6v-4z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 14H4a2 2 0 01-2-2v-1a2 2 0 012-2h16a2 2 0 012 2v1a2 2 0 01-2 2h-2"/></svg>
     </button>
 </div>
 
@@ -50,10 +50,10 @@
         </div>
 
         <div class="w-full md:w-auto">
-            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg shadow-sm font-medium transition-colors">
-                Filter
+            <button type="submit" title="Apply filters" class="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm font-medium transition-colors">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h18M6 12h12m-9 8h6"/></svg>
             </button>
-            <a href="{{ route('reports.journal') }}" class="ml-2 text-gray-600 hover:text-gray-900 px-4 py-2">Clear</a>
+            <a href="{{ route('reports.journal') }}" title="Clear filters" class="ml-2 inline-block p-2 rounded-lg bg-gray-200 text-gray-600"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></a>
         </div>
     </form>
 </div>
@@ -79,7 +79,7 @@
                 <div class="text-right text-sm">
                     <p><span class="text-gray-500">Branch:</span> {{ $journal->branch->name ?? ('#' . $journal->branch_id) }}</p>
                     <p><span class="text-gray-500">Ref:</span> {{ $journal->reference_type ?: 'N/A' }}{{ $journal->reference_id ? ' #' . $journal->reference_id : '' }}</p>
-                    <a href="{{ route('reports.journal.print', $journal->id) }}" target="_blank" class="inline-block mt-1 text-green-600 font-medium">Print Card</a>
+                    <a href="{{ route('reports.journal.print', $journal->id) }}" target="_blank" title="Print journal card" class="inline-block mt-1 p-1 text-green-600"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V2h12v7M6 18h12v4H6v-4z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 14H4a2 2 0 01-2-2v-1a2 2 0 012-2h16a2 2 0 012 2v1a2 2 0 01-2 2h-2"/></svg></a>
                 </div>
             </div>
 
