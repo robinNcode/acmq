@@ -2,6 +2,8 @@
 
 use App\Models\Sale;
 use App\Models\Account;
+use App\Models\Branch;
+use App\Models\Journal;
 use App\Models\JournalEntry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -57,6 +59,37 @@ class ReportController extends Controller{
         $accounts = Account::orderBy('name')->get();
 
         return view('reports.ledger-entries', compact('entries', 'accounts'));
+    }
+
+    public function journal(Request $request)
+    {
+        $query = Journal::with(['branch', 'entries.account'])->orderByDesc('date')->orderByDesc('id');
+
+        if ($request->filled('branch_id')) {
+            $query->where('branch_id', $request->branch_id);
+        }
+
+        if ($request->filled('reference_type')) {
+            $query->where('reference_type', $request->reference_type);
+        }
+
+        if ($request->filled('start_date')) {
+            $query->whereDate('date', '>=', $request->start_date);
+        }
+
+        if ($request->filled('end_date')) {
+            $query->whereDate('date', '<=', $request->end_date);
+        }
+
+        $journals = $query->paginate(20)->withQueryString();
+        $branches = Branch::orderBy('name')->get(['id', 'name']);
+        $referenceTypes = Journal::query()
+            ->whereNotNull('reference_type')
+            ->distinct()
+            ->orderBy('reference_type')
+            ->pluck('reference_type');
+
+        return view('reports.journal', compact('journals', 'branches', 'referenceTypes'));
     }
 
     public function trialBalance(Request $request)

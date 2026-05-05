@@ -70,6 +70,11 @@
                     General Ledger
                 </a>
 
+                <a href="{{ route('reports.journal') }}"
+                   class="block p-2 rounded transition border-l-2 {{ request()->routeIs('reports.journal') ? 'border-accent bg-secondary/50 font-semibold' : 'border-transparent hover:bg-secondary hover:border-accent' }}">
+                    Journal Report
+                </a>
+
                 <a href="{{ route('reports.trial-balance') }}"
                    class="block p-2 rounded transition border-l-2 {{ request()->routeIs('reports.trial-balance') ? 'border-accent bg-secondary/50 font-semibold' : 'border-transparent hover:bg-secondary hover:border-accent' }}">
                     Trial Balance
