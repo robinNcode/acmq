@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -21,6 +22,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'branch_id',
+        'role',
+        'employee_id',
+        'is_active',
     ];
 
     /**
@@ -42,9 +47,44 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
+            'is_active'         => 'boolean',
         ];
     }
 
+    // ─────────────────────────────────────────────────
+    // Relations
+    // ─────────────────────────────────────────────────
 
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    public function employee(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class);
+    }
+
+    // ─────────────────────────────────────────────────
+    // Role Helpers
+    // ─────────────────────────────────────────────────
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isBranchUser(): bool
+    {
+        return $this->role === 'branch_user';
+    }
+
+    /**
+     * Returns the branch ID of this user, or null for admins.
+     */
+    public function getBranchId(): ?int
+    {
+        return $this->branch_id;
+    }
 }

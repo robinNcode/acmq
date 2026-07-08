@@ -5,7 +5,7 @@ use App\Repositories\Interfaces\ExpenseRepositoryInterface;
 
 class ExpenseService
 {
-    protected $expenseRepository;
+    protected ExpenseRepositoryInterface $expenseRepository;
 
     public function __construct(ExpenseRepositoryInterface $expenseRepository)
     {

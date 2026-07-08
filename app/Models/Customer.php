@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 
 /**
- * Class CustomerController
+ * Class Customer
  *
- * Handles customer data operations including branch-wise report fetching.
+ * Handles customer data operations including branch-wise filtering.
  *
  * @package App\Models
  */
@@ -20,18 +22,27 @@ class Customer extends Model
     protected $table = 'customers';
 
     protected $fillable = [
+        'branch_id',
         'name',
         'email',
         'phone',
-        'address'
+        'address',
     ];
+
+    /**
+     * Branch relationship.
+     */
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     /**
      * Sales relationship.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function sales()
+    public function sales(): HasMany
     {
         return $this->hasMany(Sale::class);
     }
@@ -48,9 +59,7 @@ class Customer extends Model
         $query = self::query();
 
         if ($branchId) {
-            $query->whereHas('sales', function ($q) use ($branchId) {
-                $q->where('branch_id', $branchId);
-            });
+            $query->where('branch_id', $branchId);
         }
 
         return $query->withCount(['sales'])->get();

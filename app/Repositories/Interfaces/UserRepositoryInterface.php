@@ -4,13 +4,8 @@ namespace App\Repositories\Interfaces;
 
 use App\Models\User;
 
-interface UserRepositoryInterface
+interface UserRepositoryInterface extends BaseRepositoryInterface
 {
-    public function create(array $data): User;
-
     public function findByEmail(string $email): ?User;
-
     public function updatePassword(User $user, string $password): bool;
-
-    public function delete(User $user): bool;
 }
