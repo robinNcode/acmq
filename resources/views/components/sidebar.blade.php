@@ -3,7 +3,7 @@
         Accounting MQ
     </div>
 
-    <nav class="p-4 space-y-2 text-sm" x-data="{ openReports: {{ request()->routeIs('reports.*') || request()->routeIs('accounts.*') ? 'true' : 'false' }} }">
+    <nav class="p-4 space-y-2 text-sm" x-data="{ openReports: {{ request()->routeIs('reports.*')|| request()->routeIs('vouchers.*') || request()->routeIs('accounts.*') ? 'true' : 'false' }} }">
 
         <!-- Dashboard -->
         <a href="{{ route('dashboard') }}"
@@ -63,7 +63,13 @@
         <div>
             <button
                 @click="openReports = !openReports"
-                class="w-full flex justify-between items-center p-2 rounded transition focus:outline-none {{ request()->routeIs('reports.*') || request()->routeIs('accounts.*') ? 'bg-secondary text-white font-semibold' : 'hover:bg-secondary' }}">
+                class="w-full flex justify-between items-center p-2 rounded transition focus:outline-none
+                {{ request()->routeIs('reports.*')
+                    || request()->routeIs('accounts.*')
+                    || request()->routeIs('vouchers.*')
+                        ? 'bg-secondary text-white font-semibold'
+                        : 'hover:bg-secondary'
+                }}">
 
                 <span>Reports</span>
                 <svg :class="{'rotate-180': openReports}"
