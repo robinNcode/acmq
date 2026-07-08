@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Route;
 | Web Routes
 |--------------------------------------------------------------------------
 */
-
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
@@ -27,6 +26,14 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
+
+Route::get('/test-auth', function () {
+    return [
+        'check' => auth()->check(),
+        'user' => auth()->user(),
+        'session' => session()->getId(),
+    ];
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index']);
@@ -98,3 +105,4 @@ Route::middleware('auth')->group(function () {
         Route::get('/{id}/print', [VoucherController::class, 'print'])->name('print');
     });
 });
+
