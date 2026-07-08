@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BranchController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\MetricsController;
 use App\Http\Controllers\PurchaseController;
@@ -17,8 +18,8 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', [\App\Http\Controllers\DashboardController::class, 'index']);
-Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+Route::get('/', [DashboardController::class, 'index']);
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 /*
 |--------------------------------------------------------------------------
@@ -40,12 +41,15 @@ Route::resource('purchases', PurchaseController::class);
 Route::resource('sales', SaleController::class);
 Route::resource('expenses', ExpenseController::class);
 
+// Sales routes ...
 Route::get('sales/{sale}/invoice', [SaleController::class, 'invoice'])->name('sales.invoice');
-
-Route::get('/accounts', [AccountController::class, 'index'])->name('accounts.index');
-Route::post('/accounts', [AccountController::class, 'store'])->name('accounts.store');
-Route::put('/accounts/{account}', [AccountController::class, 'update'])->name('accounts.update');
-Route::delete('/accounts/{account}', [AccountController::class, 'destroy'])->name('accounts.destroy');
+// Accounts routes ...
+Route::prefix('accounts')->group(function () {
+    Route::get('/', [AccountController::class, 'index'])->name('accounts.index');
+    Route::post('/', [AccountController::class, 'store'])->name('accounts.store');
+    Route::put('/{account}', [AccountController::class, 'update'])->name('accounts.update');
+    Route::delete('/{account}', [AccountController::class, 'destroy'])->name('accounts.destroy');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -64,7 +68,7 @@ Route::prefix('reports')->name('reports.')->group(function () {
 
     Route::get('/ledger-entries', [ReportController::class, 'ledgerEntries'])
         ->name('ledger-entries');
-        
+
     Route::get('/trial-balance', [ReportController::class, 'trialBalance'])
         ->name('trial-balance');
     Route::get('/trial-balance/print', [ReportController::class, 'trialBalancePrint'])
